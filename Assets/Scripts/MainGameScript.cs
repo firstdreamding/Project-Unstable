@@ -9,6 +9,7 @@ public class MainGameScript : MonoBehaviour
     [SerializeField] public float TimeBeforeSwitch;
 
     [SerializeField] public GameObject WarningText;
+    [SerializeField] public ParticleSystem ps;
     [SerializeField] public GameObject[] dimensions;
 
     public int currentStage = 0;
@@ -41,6 +42,7 @@ public class MainGameScript : MonoBehaviour
         Debug.Log(upcomingStage);
 
         yield return new WaitForSeconds(TimeBeforeSwitch);
+        ps.Play();
         WarningText.SetActive(false);
     }
 }
