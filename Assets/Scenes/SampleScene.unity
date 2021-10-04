@@ -1394,8 +1394,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a967d145ce28954abf09b32dbf8c8c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinTime: 2
-  MaxTime: 3
+  MinTime: 30
+  MaxTime: 60
   TimeBeforeSwitch: 10
   WarningText: {fileID: 510738524}
   ps: {fileID: 1672969940}
