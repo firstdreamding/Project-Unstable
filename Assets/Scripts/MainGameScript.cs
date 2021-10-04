@@ -16,7 +16,10 @@ public class MainGameScript : MonoBehaviour
 
     [SerializeField] public GameObject ScoreObject;
 
-    public int currentStage = 0;
+    public static readonly int HELL = 0;
+    public static readonly int SPACE = 1;
+    public static int currentStage = SPACE;
+
     public int upcomingStage = 0;
     public bool DangerTime = false;
 

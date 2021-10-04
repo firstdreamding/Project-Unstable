@@ -32,34 +32,65 @@ public class BaseMovement : MonoBehaviour
     public float groundLength = 0.6f;
     public Vector3 colliderOffset;
 
+
+
+    private GameObject rocket;
+    private RocketScript rocketScript;
+
+    private void Start()
+    {
+        rocket = GameObject.Find("Rocket");
+        rocketScript = rocket.GetComponent<RocketScript>();
+    }
+
     // Update is called once per frame
     void Update()
     {
-        bool wasOnGround = onGround;
-        onGround = Physics2D.Raycast(transform.position + colliderOffset, Vector2.down, groundLength, groundLayer) 
-            || Physics2D.Raycast(transform.position - colliderOffset, Vector2.down, groundLength, groundLayer);
-
-        if (!wasOnGround && onGround)
+        if (MainGameScript.currentStage == MainGameScript.HELL) 
         {
-            StartCoroutine(JumpSqueeze(1.25f, 0.8f, 0.05f));
-        }
+            bool wasOnGround = onGround;
+            onGround = Physics2D.Raycast(transform.position + colliderOffset, Vector2.down, groundLength, groundLayer)
+                || Physics2D.Raycast(transform.position - colliderOffset, Vector2.down, groundLength, groundLayer);
 
-        if (Input.GetButtonDown("Jump"))
-        {
-            jumpTimer = Time.time + jumpDelay;
+            if (!wasOnGround && onGround)
+            {
+                StartCoroutine(JumpSqueeze(1.25f, 0.8f, 0.05f));
+            }
+
+            if (Input.GetButtonDown("Jump"))
+            {
+                jumpTimer = Time.time + jumpDelay;
+            }
+            //animator.SetBool("onGround", onGround);
+            direction = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         }
-        //animator.SetBool("onGround", onGround);
-        direction = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        else if(MainGameScript.currentStage == MainGameScript.SPACE)
+        {
+            if (Input.GetButtonDown("Jump"))
+            {
+                rocketScript.freeze = true;
+                Vector3 dp = gameObject.transform.position - rocket.transform.position;
+                dp = 100 * dp.normalized;
+                rb.AddForce(dp);
+            }
+            else if (Input.GetButtonUp("Jump"))
+            {
+                rocketScript.freeze = false;
+            }
+        }
     }
     void FixedUpdate()
     {
-        moveCharacter(direction.x);
-        if (jumpTimer > Time.time && onGround)
+        if (MainGameScript.currentStage == MainGameScript.HELL) 
         {
-            Jump();
-        }
+            moveCharacter(direction.x);
+            if (jumpTimer > Time.time && onGround)
+            {
+                Jump();
+            }
 
-        modifyPhysics();
+            modifyPhysics();
+        }
     }
     void moveCharacter(float horizontal)
     {
