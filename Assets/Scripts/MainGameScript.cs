@@ -45,4 +45,9 @@ public class MainGameScript : MonoBehaviour
         ps.Play();
         WarningText.SetActive(false);
     }
+
+    public void GameOver()
+    {
+
+    }
 }
