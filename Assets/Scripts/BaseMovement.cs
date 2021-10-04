@@ -17,7 +17,7 @@ public class BaseMovement : MonoBehaviour
 
     [Header("Components")]
     public Rigidbody2D rb;
-    //public Animator animator;
+    public Animator animator;
     public LayerMask groundLayer;
     public GameObject characterHolder;
 
@@ -41,57 +41,60 @@ public class BaseMovement : MonoBehaviour
     {
         rocket = GameObject.Find("Rocket");
         rocketScript = rocket.GetComponent<RocketScript>();
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (MainGameScript.currentStage == MainGameScript.HELL) 
+        bool wasOnGround = onGround;
+        onGround = Physics2D.Raycast(transform.position + colliderOffset, Vector2.down, groundLength, groundLayer)
+            || Physics2D.Raycast(transform.position - colliderOffset, Vector2.down, groundLength, groundLayer);
+
+        if (!wasOnGround && onGround)
         {
-            bool wasOnGround = onGround;
-            onGround = Physics2D.Raycast(transform.position + colliderOffset, Vector2.down, groundLength, groundLayer)
-                || Physics2D.Raycast(transform.position - colliderOffset, Vector2.down, groundLength, groundLayer);
-
-            if (!wasOnGround && onGround)
-            {
-                StartCoroutine(JumpSqueeze(1.25f, 0.8f, 0.05f));
-            }
-
-            if (Input.GetButtonDown("Jump"))
-            {
-                jumpTimer = Time.time + jumpDelay;
-            }
-            //animator.SetBool("onGround", onGround);
-            direction = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+            StartCoroutine(JumpSqueeze(1.25f, 0.8f, 0.05f));
         }
+
+        if (Input.GetButtonDown("Jump"))
+        {
+            jumpTimer = Time.time + jumpDelay;
+        }
+        animator.SetBool("OnGround", onGround);
+        direction = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        
+        /*
         else if(MainGameScript.currentStage == MainGameScript.SPACE)
         {
-            if (Input.GetButtonDown("Jump"))
+            if (Input.GetButtonDown("e"))
             {
                 rocketScript.freeze = true;
                 Vector3 dp = gameObject.transform.position - rocket.transform.position;
-                dp = 100 * dp.normalized;
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = 0;
+                dp = 200 * dp.normalized;
                 rb.AddForce(dp);
+                rocket.GetComponent<Animator>().SetTrigger("RocketFired");
             }
             else if (Input.GetButtonUp("Jump"))
             {
                 rocketScript.freeze = false;
+                rocket.GetComponent<Animator>().SetTrigger("RocketDone");
             }
         }
+        */
     }
     void FixedUpdate()
     {
-        if (MainGameScript.currentStage == MainGameScript.HELL) 
+        moveCharacter(direction.x);
+        if (jumpTimer > Time.time && onGround)
         {
-            moveCharacter(direction.x);
-            if (jumpTimer > Time.time && onGround)
-            {
-                Jump();
-            }
-
-            modifyPhysics();
+            Jump();
         }
+
+        modifyPhysics();
     }
+
     void moveCharacter(float horizontal)
     {
         rb.AddForce(Vector2.right * horizontal * moveSpeed);
@@ -104,8 +107,8 @@ public class BaseMovement : MonoBehaviour
         {
             rb.velocity = new Vector2(Mathf.Sign(rb.velocity.x) * maxSpeed, rb.velocity.y);
         }
-        //animator.SetFloat("horizontal", Mathf.Abs(rb.velocity.x));
-        //animator.SetFloat("vertical", rb.velocity.y);
+        animator.SetFloat("horizontal", Mathf.Abs(rb.velocity.x));
+        animator.SetFloat("vertical", rb.velocity.y);
     }
     void Jump()
     {
@@ -117,32 +120,31 @@ public class BaseMovement : MonoBehaviour
     void modifyPhysics()
     {
         bool changingDirections = (direction.x > 0 && rb.velocity.x < 0) || (direction.x < 0 && rb.velocity.x > 0);
-
-        if (onGround)
-        {
-            if (Mathf.Abs(direction.x) < 0.4f || changingDirections)
+            if (onGround)
             {
-                rb.drag = linearDrag;
+                if (Mathf.Abs(direction.x) < 0.4f || changingDirections)
+                {
+                    rb.drag = linearDrag;
+                }
+                else
+                {
+                    rb.drag = 0f;
+                }
+                rb.gravityScale = 0;
             }
             else
             {
-                rb.drag = 0f;
+                rb.gravityScale = gravity;
+                rb.drag = linearDrag * 0.15f;
+                if (rb.velocity.y < 0)
+                {
+                    rb.gravityScale = gravity * fallMultiplier;
+                }
+                else if (rb.velocity.y > 0 && !Input.GetButton("Jump"))
+                {
+                    rb.gravityScale = gravity * (fallMultiplier / 2);
+                }
             }
-            rb.gravityScale = 0;
-        }
-        else
-        {
-            rb.gravityScale = gravity;
-            rb.drag = linearDrag * 0.15f;
-            if (rb.velocity.y < 0)
-            {
-                rb.gravityScale = gravity * fallMultiplier;
-            }
-            else if (rb.velocity.y > 0 && !Input.GetButton("Jump"))
-            {
-                rb.gravityScale = gravity * (fallMultiplier / 2);
-            }
-        }
     }
     void Flip()
     {

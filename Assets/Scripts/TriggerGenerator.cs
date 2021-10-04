@@ -46,7 +46,7 @@ public class TriggerGenerator : MonoBehaviour
         while (i < 100 && lastPlatform.x < newLocation.x + 2 * screenWidth)
         {
             i++;
-            float new_x = Random.Range(4f, 10f);
+            float new_x = Random.Range(4f, 9f);
             float new_y_ceil = Mathf.Min((-0.12f * Mathf.Pow(new_x - 5, 2) + 3) + lastPlatform.y, screenHeight / 2f - 1);
             float new_y = Random.Range(screenHeight / -2f + 1, new_y_ceil);
             lastPlatform = new Vector3(new_x + lastPlatform.x, new_y, 0);
@@ -62,15 +62,18 @@ public class TriggerGenerator : MonoBehaviour
                 {
                     case 0:
                         //On top of platform case
-                        creating = Instantiate(Enemy, lastPlatform + new Vector3(0, 1), Quaternion.identity);
-                        creatingScript = creating.GetComponent<EnemyScript>();
-                        creatingScript.TargetPoints[0] = creating.transform.position;
                         if (lastPlatform.y < 0)
                         {
+                            creating = Instantiate(Enemy, lastPlatform + new Vector3(0, -1), Quaternion.identity);
+                            creatingScript = creating.GetComponent<EnemyScript>();
+                            creatingScript.TargetPoints[0] = creating.transform.position;
                             creatingScript.TargetPoints[1] = creating.transform.position +
                                 new Vector3(0, Mathf.Min(creating.transform.position.y + 6, (screenHeight / 2f) - 0.5f));
                         } else
                         {
+                            creating = Instantiate(Enemy, lastPlatform + new Vector3(0, 1), Quaternion.identity);
+                            creatingScript = creating.GetComponent<EnemyScript>();
+                            creatingScript.TargetPoints[0] = creating.transform.position;
                             creatingScript.TargetPoints[1] = creating.transform.position +
                             new Vector3(0, Mathf.Max(creating.transform.position.y - 6, (screenHeight / -2f) + 0.5f));
                         }

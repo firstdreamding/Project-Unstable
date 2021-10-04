@@ -12,20 +12,22 @@ public class MainGameScript : MonoBehaviour
     [SerializeField] public GameObject WarningText;
     [SerializeField] public ParticleSystem ps;
     [SerializeField] public GameObject[] dimensions;
+    [SerializeField] public GameObject[] dimensionsBack;
     [SerializeField] public GameObject DeathPanel;
 
     [SerializeField] public GameObject ScoreObject;
 
     public static readonly int HELL = 0;
     public static readonly int SPACE = 1;
-    public static int currentStage = SPACE;
+    public static int currentStage = HELL;
 
-    public int upcomingStage = 0;
+    public int upcomingStage = SPACE;
     public bool DangerTime = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        currentStage = HELL;
         StartCoroutine(UnstableDimension(Random.Range(MinTime, MaxTime)));
     }
 
@@ -40,17 +42,29 @@ public class MainGameScript : MonoBehaviour
         yield return new WaitForSeconds(t);
         DangerTime = true;
         WarningText.SetActive(true);
- 
-        while(upcomingStage == currentStage)
-        {
-            upcomingStage = Random.Range(0, dimensions.Length);
-        }
-
+        upcomingStage = currentStage == 0 ? 1 : 0;
         Debug.Log(upcomingStage);
 
         yield return new WaitForSeconds(TimeBeforeSwitch);
         ps.Play();
         WarningText.SetActive(false);
+        currentStage = upcomingStage;
+
+        if (currentStage != SPACE)
+        {
+            GameObject.Find("Player").GetComponent<BaseMovement>().gravity = 1;
+            dimensionsBack[0].SetActive(true);
+            dimensionsBack[1].SetActive(false);
+            upcomingStage = SPACE;
+        } else
+        {
+            GameObject.Find("Player").GetComponent<BaseMovement>().gravity = 0.6f;
+            dimensionsBack[0].SetActive(false);
+            dimensionsBack[1].SetActive(true);
+            upcomingStage = HELL;
+        }
+
+        StartCoroutine(UnstableDimension(Random.Range(MinTime, MaxTime)));
     }
 
     public void GameOver()

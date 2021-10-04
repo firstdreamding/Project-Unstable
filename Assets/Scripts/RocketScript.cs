@@ -24,9 +24,12 @@ public class RocketScript : MonoBehaviour
         relativePos.x = orbitalRadius * Mathf.Cos(theta);
         relativePos.y = orbitalRadius * Mathf.Sin(theta);
         gameObject.transform.SetPositionAndRotation(player.transform.position + relativePos, Quaternion.identity);
+        Vector3 lookPos = player.transform.position - transform.position;
+        float angle = Mathf.Atan2(lookPos.y, lookPos.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.AngleAxis(angle + -90, Vector3.forward);
         if (!freeze)
         {
-            theta += 0.01f;
+            theta += 4f * Time.deltaTime;
         }
     }
 }
