@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MainGameScript : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class MainGameScript : MonoBehaviour
     [SerializeField] public GameObject WarningText;
     [SerializeField] public ParticleSystem ps;
     [SerializeField] public GameObject[] dimensions;
+    [SerializeField] public GameObject DeathPanel;
+
+    [SerializeField] public GameObject ScoreObject;
 
     public int currentStage = 0;
     public int upcomingStage = 0;
@@ -48,6 +52,14 @@ public class MainGameScript : MonoBehaviour
 
     public void GameOver()
     {
+        DeathPanel.SetActive(true);
+        Destroy(ScoreObject.GetComponent<ScoreScript>());
+        StartCoroutine(GameOverScene(2.25f));
+    }
 
+    public IEnumerator GameOverScene(float t)
+    {
+        yield return new WaitForSeconds(t);
+        SceneManager.LoadScene(sceneName: "GameOverScene");
     }
 }

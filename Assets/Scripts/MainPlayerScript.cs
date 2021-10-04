@@ -27,19 +27,20 @@ public class MainPlayerScript : MonoBehaviour
     {
         if (transform.position.x <= mainCamera.transform.position.x - 0.5 - halfScreenConst)
         {
-            Debug.Log("DEAD");
+            GameObject.Find("Main Camera").GetComponent<MainGameScript>().GameOver();
         } else if (transform.position.y <= -1 * lowerScreenConst - 1)
         {
-            Debug.Log("DEAD");
+            GameObject.Find("Main Camera").GetComponent<MainGameScript>().GameOver();
         }
     }
 
     public void PlayerHit(int damage)
     {
         CurrentHP -= damage;
+        HeartHandlerScript.hs.OnChange(CurrentHP);
         if (CurrentHP <= 0)
         {
-            Debug.Log("ITS GAME OVER BOYSSS");
+            GameObject.Find("Main Camera").GetComponent<MainGameScript>().GameOver();
         }
     }
 }

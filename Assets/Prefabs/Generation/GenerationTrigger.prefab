@@ -73,3 +73,5 @@ MonoBehaviour:
   generator: {fileID: 8077624460034778266}
   AetherPlatform: {fileID: 5070812899813004136, guid: 5828bfa870417ab4d89d415d1d12ce6f,
     type: 3}
+  Enemy: {fileID: 193894947991293622, guid: c63502af5ca254345b6754ddc60530d0, type: 3}
+  EnemyChance: 0.15
